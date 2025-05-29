@@ -51,7 +51,7 @@ latest_message = {"text": "", "timestamp": None}
 
 @csrf_exempt
 def receive_message(request):
-    if request.method != "POST":
+    if request.method == "POST":
         return HttpResponseNotAllowed(permitted_methods=["POST"])
     
     body = request.POST.get("Body")
