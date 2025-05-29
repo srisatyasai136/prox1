@@ -6,15 +6,36 @@ from django.http import response
 # Temporary message store (use DB in real app)
 latest_message = {"text": "", "timestamp": None}
 
-@csrf_exempt
+'''@csrf_exempt
 def receive_message(request):
     if request.method == "POST":
         message_body = request.POST.get("Body")
         if message_body:
             latest_message["text"] = message_body
             latest_message["timestamp"] = timezone.now()
-            return JsonResponse({"status": "success"})
-    return JsonResponse({"status": "error"})
+            return JsonResponse({"status": "success", "received": message_body})
+    else:
+        return JsonResponse({"status": "error", "reason": "Only POST allowed"})
+'''
+@csrf_exempt
+def receive_message(request):
+    # Dump everything we got
+    method = request.method
+    post_dict = request.POST.dict()            # parsed form fields
+    raw_body = request.body.decode('utf-8')     # raw payload
+    
+    print("=== Twilio webhook hit ===")
+    print("Method:", method)
+    print("POST fields:", post_dict)
+    print("Raw body: ", raw_body)
+    
+    # Respond with a JSON echo for our debugging client
+    return JsonResponse({
+        "status": "debug",
+        "method": method,
+        "post": post_dict,
+        "body": raw_body
+    })
 
 # def  receive_message(request):
 #     return response("hello world")
